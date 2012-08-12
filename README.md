@@ -34,4 +34,3 @@ Scope = list of parameters.
 
 - Add all available endpoints
 - Error-checking
-
