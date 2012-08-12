@@ -1,6 +1,6 @@
 ##Python App.net API Wrapper
 
-Currently supports server-side authentication.
+Currently supports server-side authentication and some get requests.
 
 ##To use
 
@@ -30,7 +30,16 @@ api.getAuthResponse(code)
 
 Scope = list of parameters.
 
+If it has already been authenticated, you can create it simply by passing the access token.
+
+```python
+api = appdotnet('<access_token>')
+#eg
+api.getUser('2803')
+
+```
+
 ##To-Do:
 
-- Add all available endpoints
-- Error-checking
+- Add POST/DELETE endpoints
+- More error-checking
