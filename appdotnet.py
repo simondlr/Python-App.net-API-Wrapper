@@ -2,15 +2,15 @@ import requests
 import json
 
 #endpoints still to add.
-# - POST/DELETE endpoints
-# - Retrieve replies to post (in development by app.net)
+# - Annotations don't seem to be implemented yet. Doesn't seem to work.
 # - General parameters (in dev by app.net)
 # - Streams (in dev by app.net)
 # - Filters (in dev by app.net)
 
 class appdotnet:
 	'''
-	Once access has been given, you don't have to pass through the client_id, client_secte, redirect_uri, or scope. These are just to get the authentication token.
+	Once access has been given, you don't have to pass through the client_id, client_secret, redirect_uri, or scope.
+	These are just to get the authentication token.
 
 	Once authenticated, you can initialise appdotnet with only the access token: ie
 
@@ -59,7 +59,8 @@ class appdotnet:
 	API Calls
 	'''
 
-	def getCall(self,url):
+	#GET REQUESTS
+	def getRequest(self,url):
 		#access token
 		url = url+"?access_token="+self.access_token
 		r = requests.get(url)
@@ -72,28 +73,102 @@ class appdotnet:
 
 	def getUser(self,user_id):
 		url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id
-		return self.getCall(url)
+		return self.getRequest(url)
 
 	def getUserPosts(self,user_id):
 		url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/posts"
-		return self.getCall(url)
+		return self.getRequest(url)
 	
 	def getGlobalStream(self):
 		url = "https://"+self.public_api_anchor+"/stream/0/posts/stream/global"
-		return self.getCall(url)
+		return self.getRequest(url)
 
 	def getUserStream(self):
 		url = "https://"+self.public_api_anchor+"/stream/0/posts/stream"
-		return self.getCall(url)
+		return self.getRequest(url)
 
 	def getUserMentions(self,user_id):
 		url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/mentions"
-		return self.getCall(url)
+		return self.getRequest(url)
 
 	def getPost(self,post_id):
 		url = "https://"+self.public_api_anchor+"/stream/0/posts/"+post_id
-		return self.getCall(url)
+		return self.getRequest(url)
+	
+	def getPostReplies(self,post_id):
+		url = "https://"+self.public_api_anchor+"/stream/0/posts/"+post_id+"/replies"
+		return self.getRequest(url)
 
+	def getPostsByTag(self,tag):
+		url = "https://"+self.public_api_anchor+"/stream/0/posts/tag/"+tag
+		return self.getRequest(url)
+	
+	def getUserFollowing(self,user_id):
+		url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/following"
+		return self.getRequest(url)
+
+	def getUserFollowers(self,user_id):
+		url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/followers"
+		return self.getRequest(url)
+
+	#POST REQUESTS
+	def postRequest(self,url,data={}):
+		url = url
+		data['access_token'] = self.access_token
+		r  = requests.post(url,data=data)
+		if r.status_code == requests.codes.ok:
+			return r.text
+		else:
+			try:
+				j = json.loads(r.text)
+				return "{'error_code':"+(str)(r.status_code)+",'message':'"+j['error']['message']+"'}"
+			except: #generic error
+				print r.text
+				return "{'error':'There was an error'}"
+			
+
+	def followUser(self,user_id):
+		url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/follow"
+		return self.postRequest(url)
+		
+	#requires: text
+	#optional: reply_to, annotations, links
+	def createPost(self,text,reply_to=None,annotations=None,links=None):
+		url = "https://"+self.public_api_anchor+"/stream/0/posts"
+		data = {'text':text}
+		if reply_to != None:
+			data['reply_to'] = reply_to
+		if annotations != None:
+			data['annotations'] = annotations
+		if links != None:
+			data['links'] = links
+
+		return self.postRequest(url,data)
+		
+	
+	#DELETE request
+	def deleteRequest(self,url):
+		url = url+"?access_token="+self.access_token
+		r = requests.delete(url)
+		if r.status_code == requests.codes.ok:
+			return r.text
+		else:
+			try:
+				j = json.loads(r.text)
+				return "{'error_code':"+(str)(r.status_code)+",'message':'"+j['error']['message']+"'}"
+			except: #generic error
+				print r.text
+				return "{'error':'There was an error'}"
+
+
+	def deletePost(self,post_id):
+		url = "https://"+self.public_api_anchor+"/stream/0/posts/"+post_id
+		return self.deleteRequest(url)
+
+	def unfollowUser(self,user_id):
+		url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/follow"
+		return self.deleteRequest(url)
+		
 
 
 
