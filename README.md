@@ -1,6 +1,6 @@
 ##Python App.net API Wrapper
 
-Currently supports server-side authentication and some get requests.
+A simple wrapper for App.net's API.
 
 ##To use
 
@@ -39,7 +39,22 @@ api.getUser('2803')
 
 ```
 
+Example post (after authentication):
+
+```python
+api = appdotnet('<access_token>')
+#eg
+api.createPost('Hi. This is a simple post. Ke Nako! App.net is here.')
+api.createPost('Testing annotations. Adding meta info.',annotations={'meta':'some info'})
+
+```
+
+
 ##To-Do:
 
-- Add POST/DELETE endpoints
 - More error-checking
+- Add stream/filter/subscription endpoints when it becomes available.
+
+##NOTE:
+
+Annotations don't seem to be working. Unsure whether it is an API issue. Will fix once I find out.
