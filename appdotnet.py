@@ -67,7 +67,7 @@ class appdotnet:
     #GET REQUESTS
     def getRequest(self, url):
         #access token
-        url = url+"?access_token="+self.access_token
+        url = url + "?access_token=" + self.access_token
         r = requests.get(url)
         if r.status_code == requests.codes.ok:
             return r.text
@@ -89,7 +89,6 @@ class appdotnet:
         return self.getRequest(url)
 
     def getGlobalStream(self):
-
         url = "https://%s/stream/0/posts/stream/global" % self.public_api_anchor
         return self.getRequest(url)
 
