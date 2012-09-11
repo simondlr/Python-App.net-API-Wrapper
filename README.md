@@ -33,16 +33,16 @@ Scope = list of parameters.
 If it has already been authenticated, you can create it simply by passing the access token.
 
 ```python
-api = appdotnet('<access_token>')
+api = appdotnet(access_token='<access_token>')
 #eg
-api.getUser('2803')
+api.getUser(2803)
 
 ```
 
 Example post (after authentication):
 
 ```python
-api = appdotnet('<access_token>')
+api = appdotnet(access_token='<access_token>')
 #eg
 api.createPost('Hi. This is a simple post. Ke Nako! App.net is here.')
 api.createPost('Testing annotations. Adding meta info.',annotations={'meta':'some info'})
