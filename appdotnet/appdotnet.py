@@ -121,6 +121,9 @@ class appdotnet:
         return self.getRequest(url)
 
     #POST REQUESTS
+    def postRequest(self, url, data=None):
+        if not data:
+            data = {}
         url = url
         data['access_token'] = self.access_token
         r  = requests.post(url,data=data)
