@@ -35,7 +35,7 @@ If it has already been authenticated, you can create it simply by passing the ac
 ```python
 api = appdotnet(access_token='<access_token>')
 #eg
-api.getUser(2803)
+api.getUser('2803')
 
 ```
 
@@ -45,7 +45,6 @@ Example post (after authentication):
 api = appdotnet(access_token='<access_token>')
 #eg
 api.createPost('Hi. This is a simple post. Ke Nako! App.net is here.')
-api.createPost('Testing annotations. Adding meta info.',annotations={'meta':'some info'})
 
 ```
 
@@ -53,15 +52,11 @@ api.createPost('Testing annotations. Adding meta info.',annotations={'meta':'som
 
 - More error-checking
 - Add stream/filter/subscription endpoints when it becomes available.
-- Add mute endpoints (they are live).
-
-##NOTE:
-
-Annotations don't seem to be working. Unsure whether it is an API issue. Will fix once I find out.
+- Add Identity Delegation.
 
 ##License:
 
-License
+MIT License
 
 Copyright (c) 2012 Simon de la Rouviere
 

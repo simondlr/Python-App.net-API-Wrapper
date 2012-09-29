@@ -1,9 +1,8 @@
 import json
 import requests
 
-#endpoints still to add.
-# - Annotations don't seem to be implemented yet. Doesn't seem to work.
-# - General parameters (in dev by app.net)
+# To add
+# - Identity Delegation
 # - Streams (in dev by app.net)
 # - Filters (in dev by app.net)
 
@@ -65,9 +64,17 @@ class appdotnet:
     '''
 
     #GET REQUESTS
-    def getRequest(self, url):
+    def getRequest(self, url, getParameters=None):
+        if not getParameters:
+            getParameters = {}
         #access token
         url = url + "?access_token=" + self.access_token
+
+        #if there are any extra get parameters aside from the access_token, append to the url
+        if getParameters != {}:
+            for key,value in getParameters.iteritems():
+                url = url + "&" + key + "=" + value
+
         r = requests.get(url)
         if r.status_code == requests.codes.ok:
             return r.text
@@ -79,12 +86,17 @@ class appdotnet:
 
 
     def getUser(self, user_id):
-        url = "https://%s/stream/0/users/%i" % (self.public_api_anchor,
+        url = "https://%s/stream/0/users/%s" % (self.public_api_anchor,
                                                 user_id)
         return self.getRequest(url)
 
     def getUserPosts(self, user_id):
-        url = "https://%s/stream/0/users/%i/posts" % (self.public_api_anchor,
+        url = "https://%s/stream/0/users/%s/posts" % (self.public_api_anchor,
+                                                      user_id)
+        return self.getRequest(url)
+
+    def getUserStars(self, user_id):
+        url = "https://%s/stream/0/users/%s/stars" % (self.public_api_anchor,
                                                       user_id)
         return self.getRequest(url)
 
@@ -97,36 +109,60 @@ class appdotnet:
         return self.getRequest(url)
 
     def getUserMentions(self, user_id):
-        url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/mentions"
+        url = "https://%s/stream/0/users/%s/mentions" % (self.public_api_anchor,user_id)
         return self.getRequest(url)
 
     def getPost(self, post_id):
-        url = "https://"+self.public_api_anchor+"/stream/0/posts/"+post_id
+        url = "https://%s/stream/0/posts/%s" % (self.public_api_anchor,post_id)
+        return self.getRequest(url)
+
+    def getReposters(self, post_id):
+        url ="https://%s/stream/0/posts/%s/reposters" % (self.public_api_anchor,post_id)
+        return self.getRequest(url)
+
+    def getStars(self, post_id):
+        url ="https://%s/stream/0/posts/%s/stars" % (self.public_api_anchor,post_id)
         return self.getRequest(url)
 
     def getPostReplies(self, post_id):
-        url = "https://"+self.public_api_anchor+"/stream/0/posts/"+post_id+"/replies"
+        url = "https://%s/stream/0/posts/%s/replies" % (self.public_api_anchor,post_id)
         return self.getRequest(url)
 
     def getPostsByTag(self, tag):
-        url = "https://"+self.public_api_anchor+"/stream/0/posts/tag/"+tag
+        url = "https://%s/stream/0/posts/tag/%s" % (self.public_api_anchor, tag)
         return self.getRequest(url)
 
     def getUserFollowing(self, user_id):
-        url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/following"
+        url = "https://%s/stream/0/users/%s/following" % (self.public_api_anchor, user_id)
         return self.getRequest(url)
 
     def getUserFollowers(self, user_id):
-        url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/followers"
+        url = "https://%s/stream/0/users/%s/followers" % (self.public_api_anchor, user_id)
+        return self.getRequest(url)
+
+    def getMutedUsers(self):
+        url = "https://%s/stream/0/users/me/muted" % self.public_api_anchor
+        return self.getRequest(url)
+
+    def searchUsers(self,q):
+        url = "https://%s/stream/0/users/search" % (self.public_api_anchor)
+        return self.getRequest(url,getParameters={'q':q})
+
+    def getCurrentToken(self):
+        url = "https://%s/stream/0/token" % self.public_api_anchor
         return self.getRequest(url)
 
     #POST REQUESTS
-    def postRequest(self, url, data=None):
+    def postRequest(self, url, data=None, headers=None):
         if not data:
             data = {}
+
+        if not headers:
+            headers = {}
+
+        headers['Authorization'] = 'Bearer %s' % self.access_token
         url = url
-        data['access_token'] = self.access_token
-        r  = requests.post(url,data=data)
+        r  = requests.post(url,data=json.dumps(data),headers=headers)
         if r.status_code == requests.codes.ok:
             return r.text
         else:
@@ -141,15 +177,28 @@ class appdotnet:
 
 
     def followUser(self,user_id):
-        url = "https://" + self.public_api_anchor + "/stream/0/users/" +\
-                user_id + "/follow"
+        url = "https://%s/stream/0/users/%s/follow" % (self.public_api_anchor, user_id)
+        return self.postRequest(url)
 
+    def repostPost(self,post_id):
+        url = "https://%s/stream/0/posts/%s/repost" % (self.public_api_anchor, post_id)
+        return self.postRequest(url)
+
+    def starPost(self,post_id):
+        url = "https://%s/stream/0/posts/%s/star" % (self.public_api_anchor, post_id)
+        return self.postRequest(url)
+
+    def muteUser(self,user_id):
+        url = "https://%s/stream/0/users/%s/mute" % (self.public_api_anchor, user_id)
         return self.postRequest(url)
 
     #requires: text
     #optional: reply_to, annotations, links
     def createPost(self, text, reply_to = None, annotations=None, links=None):
-        url = "https://"+self.public_api_anchor+"/stream/0/posts"
+        url = "https://%s/stream/0/posts" % self.public_api_anchor
+        if annotations != None:
+            url = url + "?include_annotations=1"
+
         data = {'text':text}
         if reply_to != None:
             data['reply_to'] = reply_to
@@ -158,7 +207,7 @@ class appdotnet:
         if links != None:
             data['links'] = links
 
-        return self.postRequest(url,data)
+        return self.postRequest(url,data,headers={'content-type':'application/json'})
 
     #DELETE request
     def deleteRequest(self, url):
@@ -177,10 +226,22 @@ class appdotnet:
                 return "{'error':'There was an error'}"
 
     def deletePost(self, post_id):
-        url = "https://"+self.public_api_anchor+"/stream/0/posts/"+post_id
+        url = "https://%s/stream/0/posts/%s" % (self.public_api_anchor,post_id)
+        return self.deleteRequest(url)
+
+    def unrepostPost(self, post_id):
+        url = "https://%s/stream/0/posts/%s/repost" % (self.public_api_anchor,post_id)
+        return self.deleteRequest(url)
+
+    def unstarPost(self, post_id):
+        url = "https://%s/stream/0/posts/%s/star" % (self.public_api_anchor,post_id)
         return self.deleteRequest(url)
 
     def unfollowUser(self, user_id):
-        url = "https://"+self.public_api_anchor+"/stream/0/users/"+user_id+"/follow"
+        url = "https://%s/stream/0/users/%s/follow" % (self.public_api_anchor,user_id)
+        return self.deleteRequest(url)
+
+    def unmuteUser(self, user_id):
+        url = "https://%s/stream/0/users/%s/mute" % (self.public_api_anchor,user_id)
         return self.deleteRequest(url)
 
