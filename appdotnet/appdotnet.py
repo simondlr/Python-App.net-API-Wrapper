@@ -79,10 +79,12 @@ class appdotnet:
         if r.status_code == requests.codes.ok:
             return r.text
         else:
-            j = json.loads(r.text)
-            resp = {'error_code': r.status_code,
-                        'message' : j['error']['message']}
-            return json.dumps(resp)
+            print r.text
+            #j = json.loads(r.text)
+            #resp = {'error_code': r.status_code, 'message' : j['error']['message']}
+            #print j
+            #return json.dumps(resp)
+            return r.text
 
 
     def getUser(self, user_id):
@@ -106,6 +108,10 @@ class appdotnet:
 
     def getUserStream(self):
         url = "https://%s/stream/0/posts/stream" % self.public_api_anchor
+        return self.getRequest(url)
+
+    def getUserStreamUnified(self):
+        url = "https://%s/stream/0/posts/stream/unified" % self.public_api_anchor
         return self.getRequest(url)
 
     def getUserMentions(self, user_id):
@@ -151,6 +157,37 @@ class appdotnet:
     def getCurrentToken(self):
         url = "https://%s/stream/0/token" % self.public_api_anchor
         return self.getRequest(url)
+
+    def getAChannel(self, chan, **args):
+        url = "https://%s/stream/0/channels/%d" % (self.public_api_anchor, chan)
+        return self.getRequest(url, args)
+
+    # Reminder: if you include ids=... it reads those ids.
+    # Otherwise it defaults to those you are subscribed to
+    def getChannels(self, **args):
+        url = "https://%s/stream/0/channels" % self.public_api_anchor
+        return self.getRequest(url, args)
+
+    def getMessageChannel(self, chan, **args):
+        url = "https://%s/stream/0/channels/%s/messages" % (self.public_api_anchor, chan)
+        return self.getRequest(url, args)
+        
+    def getMyChannels(self):
+        url = "https://%s/stream/0/users/me/channels" % self.public_api_anchor
+        return self.getRequest(url)
+
+    def subscribeChannel(self, channel_id):
+        url = "https://%s/stream/0/channels/%s/subscribe" % (self.public_api_anchor, channel_id)
+        return self.postRequest(url)
+
+    def postChannel(self, chan, **args):
+        url = "https://%s/stream/0/channels/%s/messages" % (self.public_api_anchor, chan)
+        return self.postRequest(url, args,headers={'content-type':'application/json'})
+
+    def deleteMessage(self, chan, msg):
+        url = "https://%s/stream/0/channels/%s/messages/%s" % (self.public_api_anchor, chan, msg)
+        return self.deleteRequest(url)
+        
 
     #POST REQUESTS
     def postRequest(self, url, data=None, headers=None):
