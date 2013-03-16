@@ -158,36 +158,116 @@ class appdotnet:
         url = "https://%s/stream/0/token" % self.public_api_anchor
         return self.getRequest(url)
 
-    def getAChannel(self, chan, **args):
-        url = "https://%s/stream/0/channels/%d" % (self.public_api_anchor, chan)
-        return self.getRequest(url, args)
+
 
     # Reminder: if you include ids=... it reads those ids.
     # Otherwise it defaults to those you are subscribed to
+    # http://developers.app.net/docs/resources/channel/subscriptions/#get-current-users-subscribed-channels
+    # http://developers.app.net/docs/resources/channel/lookup/#retrieve-multiple-channels
     def getChannels(self, **args):
         url = "https://%s/stream/0/channels" % self.public_api_anchor
         return self.getRequest(url, args)
 
-    def getMessageChannel(self, chan, **args):
-        url = "https://%s/stream/0/channels/%s/messages" % (self.public_api_anchor, chan)
+    # http://developers.app.net/docs/resources/channel/lookup/#retrieve-a-channel
+    def getAChannel(self, chan, **args):
+        url = "https://%s/stream/0/channels/%d" % (self.public_api_anchor, chan)
         return self.getRequest(url, args)
-        
-    def getMyChannels(self):
-        url = "https://%s/stream/0/users/me/channels" % self.public_api_anchor
-        return self.getRequest(url)
 
+    # http://developers.app.net/docs/resources/channel/lifecycle/#create-a-channel
+    def createChannel(self, **args):
+        url = "https://%s/stream/0/channels" % self.public_api_anchor
+        return self.postRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/lookup/#retrieve-my-channels
+    def getMyChannels(self, **args):
+        url = "https://%s/stream/0/users/me/channels" % self.public_api_anchor
+        return self.getRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/lookup/#retrieve-number-of-unread-pm-channels
+    def getUnreadPMChannels(self, **args):
+        url = "https://%s/stream/0/users/me/channels/pm/num_unread" % self.public_api_anchor
+        return self.getRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/lifecycle/#update-a-channel
+    def updateChannel(self, channel_id, **args):
+        url = "https://%s/stream/0/channels/%s" % (self.public_api_anchor, channel_id)
+        return self.putRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/subscriptions/#subscribe-to-a-channel
     def subscribeChannel(self, channel_id):
         url = "https://%s/stream/0/channels/%s/subscribe" % (self.public_api_anchor, channel_id)
         return self.postRequest(url)
 
-    def postChannel(self, chan, **args):
+    # http://developers.app.net/docs/resources/channel/subscriptions/#unsubscribe-from-a-channel
+    def unsubscribeChannel(self, channel_id):
+        url = "https://%s/stream/0/channels/%s/subscribe" % (self.public_api_anchor, channel_id)
+        return self.deleteRequest(url)
+
+    # http://developers.app.net/docs/resources/channel/subscriptions/#retrieve-users-subscribed-to-a-channel
+    def getChannelSubscribes(self, chan, **args):
+        url = "https://%s/stream/0/channels/%d/subscribers" % (self.public_api_anchor, chan)
+        return self.getRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/subscriptions/#retrieve-user-ids-subscribed-to-a-channel
+    def getChannelSubscribeIds(self, chan, **args):
+        url = "https://%s/stream/0/channels/%d/subscribers/ids" % (self.public_api_anchor, chan)
+        return self.getRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/subscriptions/#retrieve-user-ids-subscribed-to-a-channel
+    # Note: required: use ids=...
+    def getMultipleChannelSubscribeIds(self, **args):
+        url = "https://%s/stream/0/channels/subscribers/ids" % (self.public_api_anchor)
+        return self.getRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/muting/#mute-a-channel
+    def muteChannel(self, chan, **args):
+        url = "https://%s/stream/0/channels/%d/mute" % (self.public_api_anchor, chan)
+        return self.postRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/muting/#unmute-a-channel
+    def unmuteChannel(self, chan, **args):
+        url = "https://%s/stream/0/channels/%d/mute" % (self.public_api_anchor, chan)
+        return self.deleteRequest(url, args)
+
+    # http://developers.app.net/docs/resources/channel/muting/#get-current-users-muted-channels
+    def getMutedChannels(self, **args):
+        url = "https://%s/stream/0/users/me/channels/muted" % self.public_api_anchor
+        return self.getRequest(url, args)
+
+
+    # http://developers.app.net/docs/resources/message/lifecycle/#retrieve-the-messages-in-a-channel
+    def getMessageChannel(self, chan, **args):
+        url = "https://%s/stream/0/channels/%s/messages" % (self.public_api_anchor, chan)
+        return self.getRequest(url, args)
+        
+    # http://developers.app.net/docs/resources/message/lifecycle/#create-a-message
+    def createMessage(self, chan, **args):
         url = "https://%s/stream/0/channels/%s/messages" % (self.public_api_anchor, chan)
         return self.postRequest(url, args,headers={'content-type':'application/json'})
 
+    # http://developers.app.net/docs/resources/message/lookup/#retrieve-a-message
+    def getMessage(self, chan, msg,  **args):
+        url = "https://%s/stream/0/channels/%s/messages/%s" % (self.public_api_anchor, chan, msg)
+        return self.getRequest(url, args)
+
+    # http://developers.app.net/docs/resources/message/lookup/#retrieve-multiple-messages
+    # Note: ids= required
+    def getMultiMessages(self, **args):
+        url = "https://%s/stream/0/channels/messages" % self.public_api_anchor
+        return self.getRequest(url, args)
+
+    # http://developers.app.net/docs/resources/message/lookup/#retrieve-my-messages
+    def getMyMessages(self, **args):
+        url = "https://%s/stream/0/users/me/messages" % self.public_api_anchor
+        return self.getRequest(url, args)
+
+    # http://developers.app.net/docs/resources/message/lifecycle/#delete-a-message
     def deleteMessage(self, chan, msg):
         url = "https://%s/stream/0/channels/%s/messages/%s" % (self.public_api_anchor, chan, msg)
         return self.deleteRequest(url)
-        
+    
+
+
 
     #POST REQUESTS
     def postRequest(self, url, data=None, headers=None):
