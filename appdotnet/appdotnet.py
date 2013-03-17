@@ -160,7 +160,7 @@ class appdotnet:
 
 
 
-    # Reminder: if you include ids=... it reads those ids.
+    # Reminder: if you include ids="id,id,id" it reads those ids.
     # Otherwise it defaults to those you are subscribed to
     # http://developers.app.net/docs/resources/channel/subscriptions/#get-current-users-subscribed-channels
     # http://developers.app.net/docs/resources/channel/lookup/#retrieve-multiple-channels
@@ -170,7 +170,7 @@ class appdotnet:
 
     # http://developers.app.net/docs/resources/channel/lookup/#retrieve-a-channel
     def getAChannel(self, chan, **args):
-        url = "https://%s/stream/0/channels/%d" % (self.public_api_anchor, chan)
+        url = "https://%s/stream/0/channels/%s" % (self.public_api_anchor, chan)
         return self.getRequest(url, args)
 
     # http://developers.app.net/docs/resources/channel/lifecycle/#create-a-channel
@@ -205,12 +205,12 @@ class appdotnet:
 
     # http://developers.app.net/docs/resources/channel/subscriptions/#retrieve-users-subscribed-to-a-channel
     def getChannelSubscribes(self, chan, **args):
-        url = "https://%s/stream/0/channels/%d/subscribers" % (self.public_api_anchor, chan)
+        url = "https://%s/stream/0/channels/%s/subscribers" % (self.public_api_anchor, chan)
         return self.getRequest(url, args)
 
     # http://developers.app.net/docs/resources/channel/subscriptions/#retrieve-user-ids-subscribed-to-a-channel
     def getChannelSubscribeIds(self, chan, **args):
-        url = "https://%s/stream/0/channels/%d/subscribers/ids" % (self.public_api_anchor, chan)
+        url = "https://%s/stream/0/channels/%s/subscribers/ids" % (self.public_api_anchor, chan)
         return self.getRequest(url, args)
 
     # http://developers.app.net/docs/resources/channel/subscriptions/#retrieve-user-ids-subscribed-to-a-channel
@@ -221,13 +221,13 @@ class appdotnet:
 
     # http://developers.app.net/docs/resources/channel/muting/#mute-a-channel
     def muteChannel(self, chan, **args):
-        url = "https://%s/stream/0/channels/%d/mute" % (self.public_api_anchor, chan)
+        url = "https://%s/stream/0/channels/%s/mute" % (self.public_api_anchor, chan)
         return self.postRequest(url, args)
 
     # http://developers.app.net/docs/resources/channel/muting/#unmute-a-channel
-    def unmuteChannel(self, chan, **args):
-        url = "https://%s/stream/0/channels/%d/mute" % (self.public_api_anchor, chan)
-        return self.deleteRequest(url, args)
+    def unmuteChannel(self, chan):
+        url = "https://%s/stream/0/channels/%s/mute" % (self.public_api_anchor, chan)
+        return self.deleteRequest(url)
 
     # http://developers.app.net/docs/resources/channel/muting/#get-current-users-muted-channels
     def getMutedChannels(self, **args):
